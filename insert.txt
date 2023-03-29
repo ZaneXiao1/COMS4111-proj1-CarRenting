@@ -1,0 +1,62 @@
+insert into car_type values ('Mustang', 'Ford', 'car', 75, 5, 4), ('Yukon XL', 'GMC', 'suv', 42, 4.42, 9), 
+('Expedition', 'Ford', 'suv', 117, 4.9, 9), ('Explorer', 'Ford', 'suv', 97, 4.5, 7), 
+('Rogue', 'Nissan', 'suv', 41, 4.92, 5), ('i8', 'BMW', 'car', 299, 4.93, 4), 
+('3-Sep', 'Saab', 'car', 42, 4.88, 4), 
+('HS 250h', 'Lexus', 'car', 64, 4.81, 5), ('Camry', 'Toyota', 'car', 56, 4.86, 5);
+
+
+insert into car values ('183700', 'black', 5, 'Mustang', 'newyorkcity'), 
+('183701', 'red', 3, 'Mustang', 'chicago'),
+('537091', 'silver', 2, 'Yukon XL', 'las_vegas'),
+('537092', 'silver', 2, 'Yukon XL', 'san_francisco'),
+('410304', 'red', 2, 'Expedition', 'seattle'),
+('199912', 'white', 2, '3-Sep', 'washington'),
+('291533', 'black', 2, 'Rogue', 'san_diego'),
+('291534', 'gray', 2, 'Rogue', 'san_diego'),
+('601666', 'gray', 2, 'i8', 'newyorkcity'),
+('660058', 'blue', 2, '3-Sep', 'newyorkcity'),
+('892457', 'blue', 2, 'Prius', 'chicago'),
+('892458', 'black', 2, 'HS 250h', 'chicago'),
+('039228', 'black', 2, 'Camry', 'las_vegas');
+
+insert into car values ('039229', 'black', 5, 'Camry', 'seattle');
+
+
+insert into customer values ('F9GK7R3', 'Gabriela Hernandez', 'samlth23@gmail.com', '4151234567', 'A1ghac'),
+('A2BZ8P6', 'Marcus Lee', 'emily.martin98@yahoo.com', '8569328845', 'P6ghTfN7'),
+('H4JX9N2', 'Natasha Singh', 'natashasingh84@example.com', '9712384857', 'R5vBnH3m'),
+('C7DQ1M5', 'Samuel Thompson', 'kj77@hotmail.com', '6026952664', 'E2tgbhD1yhnj'),
+('E6LW5S8', 'Julia Martinez', 'jmartinez17@gmail.com', '8157976796', 'Jm8549'),
+('K1VY3T9', 'Aaron Chen', 'lauren88@outlook.com', '4151234567', 'A1ghac'),
+('N8UH2F4', 'Emily Nguyen', 'emilynguyen21@example.com', '2125973672', 'EN123456'),
+('R2IY6G7', 'Ricardo Ortiz', 'samlth23@gmail.com', '4695427169', 'Abc123'),
+('S7TQ4P9', 'Sarah Adams', 'example@gmail.com', '9013720136', 'S314159'),
+('W3XK8N6', 'Juan Rodriguez', 'w3xk8n6@163.com', '5107814681', 'X3cVbN5S'),
+('Z9JH1D5', 'Rachel Kim', 'car.rent5@qq.com', '6823086720', 'R37465K');
+
+insert into customer values ('CU9527', 'Samantha Wright', 'robert.brown55@gmail.com', '6015556789', 'SW7980');
+
+
+insert into reservation values ('22060932', '2022-06-12 08:10:25-07', '2022-06-13 19:10:25-07', 97, '183701', 'F9GK7R3');
+
+insert into reservation values ('22121960', '2022-12-25 11:30:15-05', '2022-12-29 21:02:30-05', 223, '660058', 'S7TQ4P9');
+
+insert into reservation values ('23021023', '2023-02-14 09:03:30-05', '2023-02-14 18:45:56-05', 31, '892457', 'W3XK8N6'),
+('22110724', '2022-11-11 17:20:40-04', '2022-11-12 17:12:13-04', 36, '183701', 'A2BZ8P6'),
+('22122031', '2022-12-31 03:59:59-05', '2023-01-04 22:05:09-05', 1521, '601666', 'R2IY6G7'),
+('23021649', '2023-02-28 18:15:00-05', '2023-03-02 17:45:13-05', 90, '199912', 'N8UH2F4'),
+('23020027', '2023-02-01 10:25:35-05', '2023-02-01 20:52:05-05', 63, '039228', 'K1VY3T9'),
+('22100380', '2022-10-08 09:30:20-04', '2022-10-10 18:07:52-04', 128, '291533', 'E6LW5S8'),
+('23050374', '2023-03-05 08:45:10-04', '2023-03-06 19:31:41-04', 85, '291534', 'E6LW5S8');
+
+insert into reservation values ('18060823', '2018-06-12 10:04:21-05', '2018-06-15 17:48:37-05', 170.3, '291533', 'C7DQ1M5');
+
+insert into reservation values ('23010002', '2023-01-01 04:15:00-05', '2023-01-02 17:13:00-05', 86, '199912', 'N8UH2F4')
+
+update car set mileage=4 where car_id='537091';
+update car set mileage=4 where car_id='660058';
+update car set mileage=1 where car_id='601666';
+update car set mileage=6 where car_id='291533' or  car_id='291534';
+update car set mileage=3 where car_id='892458';
+
+update customer, reservation, contact set user_id='F9GK' where user_id='F9GK7R3';

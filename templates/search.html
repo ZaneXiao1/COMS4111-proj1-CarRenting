@@ -1,0 +1,84 @@
+<html lang="en">
+  <title>Car Rental - Finding Avaliable Cars</title>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+      text-align: center;
+    }
+    h1{text-align: center;}
+    div{text-align: center;}
+    table{margin: auto;}
+    select{font-size: 12pt;}
+    .option_area{text-align:left;display:inline-block;}
+  </style>
+
+
+<body>
+  <h1>Finding Avaliable Cars</h1>
+  <hr>
+
+<div>
+  <div class="option_area">
+  <form method="POST" action="/search">
+    Pick up/drop off location:
+    <select name="office" onchange="this.form.submit()">
+      <!-- onchange="this.form.submit()" -->
+      <option value="none" selected="selected">any location</option>
+      {% for off in offices %}
+      <option value="{{off}}" {% if off == office %}selected="selected"{% endif %}>{{off}}</option>
+      {% endfor %}
+    </select>
+    <br>
+    Model:
+    <select name="model">
+      <option value="none" selected="selected">any model</option>
+      {% for m in models %}
+      <option value="{{m}}" {% if m == model %}selected="selected"{% endif %}>{{m}}</option>
+      {% endfor %}
+    </select>
+    <br>
+    Start time:
+    <input type="datetime-local" name="start" value="{% if start is defined %}{{start}}{% else %}{{now}}{% endif %}"/> 
+    <!-- step="3600" min="{{now}}" -->
+    <br>
+    End time:
+    <input type="datetime-local" name="end" value="{% if end is defined %}{{end}}{% else %}{{now}}{% endif %}"/> 
+    <br>
+    <br>
+    <input type="submit" value="Search" style="font-size:12pt;">
+    <input type="submit" name="reset" value="Reset" style="font-size:12pt;">
+  </form>
+</div>
+</div>
+  <hr>
+
+  <hr>
+<div>
+  <table border="1">
+    {% if results|length <= 1 %}
+      {% if model is defined%}
+        <p>No avaliable car with model {{model}} at {{office}} for the time domain.</p>
+      {% else %}
+        <p>Choose your prefered location, model and time. Then click search to find cars!</p>
+      {% endif %}
+    {% else %}
+      {% if start is defined and end is defined and start > end%}
+        <p> start time should not be later than end time!</p>
+      {% else %}
+        {% for i in results %}
+            <tr>
+                {% for j in i %}
+                    <td><b>{{ j }}</b></td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+      {% endif %}
+    {% endif %}
+  </table>
+</div>
+
+</body>
+
+
+</html>

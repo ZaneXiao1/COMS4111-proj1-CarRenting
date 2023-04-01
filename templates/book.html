@@ -1,0 +1,66 @@
+<html>
+  <style>
+    body{ 
+      font-size: 15pt;
+      font-family: arial;
+      text-align: center;
+      align-items: center;
+    }
+    table {
+      font-size: 15pt;
+      border-collapse: collapse;
+      margin: auto;
+      text-align:left;
+    }
+    .car_info {
+      width: 700px;
+      background-color: rgb(237, 243, 251);
+      border: 1px solid #ddd;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: left;
+      margin: auto;
+    }
+    .option_area{text-align:left; display:inline-block;}
+  </style>
+
+
+<body>
+  <h1>Your Deal</h1>
+  <hr>
+  <div class="car_info">
+    <h4>{{car.model}} - {{car.brand}}</h4>
+    <table border="0">
+        <th>Capacity:</th><th>{{car.capacity}}</th><th>&emsp;&emsp;&emsp;</th>
+        <th>Mileage:</th><th>{{car.mileage}}</th><th>&emsp;&emsp;&emsp;</th>
+        <tr>
+        <th>Color:</th><th>{{car.color}}</th><th>&emsp;&emsp;&emsp;</th>
+        <th>Function:</th><th>{{car.function}}</th><th>&emsp;&emsp;&emsp;</th>
+        <tr>
+        <th>Price/day:</th><th>{{car.unit_time_price}}</th><th>&emsp;&emsp;&emsp;</th>
+    </table>
+    <br>
+  </div>
+  <div>
+    <form class="option_area">
+        Start time:
+        <input type="datetime-local" name="start" value="{% if start is defined %}{{start}}{% else %}{{now}}{% endif %}"/> 
+        <!-- step="3600" min="{{now}}" -->
+        <br>
+        End time:
+        <input type="datetime-local" name="end" value="{% if end is defined %}{{end}}{% else %}{{now}}{% endif %}"/> 
+        <br>
+        <br>
+        Insurance: 
+        <input type="checkbox" name="insuranceCheck" value="insurance">
+        <br>
+        <br>
+        <input type="submit" value="Book" style="font-size:12pt;">
+    </form>
+  </div>
+
+
+</body>
+
+
+</html>

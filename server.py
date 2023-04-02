@@ -13,7 +13,7 @@ import os
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
 from flask import Flask, request, render_template, g, redirect, Response, session
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 import time
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
@@ -201,15 +201,20 @@ def search():
     office = request.form.get('office')
     model = request.form.get('model')
     start = request.form.get('start')
+    startHour = request.form.get('startHour')
+    endHour = request.form.get('endHour')
     end = request.form.get('end')
     rating = request.form.get('high_rate')
-    t = datetime.now()
-    now = str(t).rsplit(":", 1)[0]
+    today = str(date.today())
+    hour = str(datetime.now().hour)#.rsplit(":", 1)[0]
     if start == '' or start == None:
-        start = now
+        start = today
     if end == '' or end == None:
-        end = now
-    # print("start", start)
+        end = today
+    if startHour == '' or startHour == None:
+        startHour = hour
+    if endHour == '' or endHour == None:
+        endHour = hour
     rated = False
     if rating == '' or rating == None:
         rating = 0
@@ -237,10 +242,11 @@ def search():
     if request.method=='POST':
         session['start'] = start
         session['end'] = end
+        session['startHour'] = startHour
+        session['endHour'] = endHour
 
         s = 'SELECT C.*, brand, function, capacity, unit_time_price, rating FROM car C, car_type CT WHERE C.model=CT.model AND CT.rating>=%f' % rating
         # constraint office
-        print(s)
         if office != 'none' and office != None:
             params["office"] = office
             s += " AND C.office_name=(:office)"
@@ -249,9 +255,9 @@ def search():
             params["model"] = model
             s += " AND C.model=(:model)"
         # constraint start time
-        params["start"] = start+time.strftime('%z')
-        params["end"] = end+time.strftime('%z')
-        print(start, end)
+        params["start"] = start+" "+startHour+":00"+time.strftime('%z')
+        params["end"] = end+" "+endHour+":00"+time.strftime('%z')
+        # print(start, end)
         s += " AND NOT EXISTS (SELECT * FROM reservation R WHERE C.car_id=R.car_id AND NOT (R.start_time>(:end) OR R.end_time<(:start)))"
         # s += " LIMIT 12"
         # print(s)
@@ -263,22 +269,72 @@ def search():
         params["start"] = start
         params["end"] = end
     
-    context = dict(results=search_result, offices=off_result, models=model_result, now=now, rated=rated, **params)
+    context = dict(results=search_result, offices=off_result, models=model_result, today=today, shour=int(startHour), ehour=int(endHour), rated=rated, **params)
     return render_template('search.html', **context)
 
 
 @app.route('/book/<string:car_id>')
 def book(car_id):
     # Code to retrieve car details from the database
-
     start = session.get('start')
     end = session.get('end')
+    startHour = session.get('startHour')
+    endHour = session.get('endHour')
     
-    cursor = g.conn.execute(text("SELECT C.model, brand, capacity, mileage, color, function, unit_time_price FROM car C, car_type CT WHERE C.model=CT.model AND C.car_id='" + car_id + "'"))
+    cursor = g.conn.execute(text("SELECT car_id, C.model, brand, capacity, mileage, color, function, unit_time_price, office_name FROM car C, car_type CT WHERE C.model=CT.model AND C.car_id='" + car_id + "'"))
     rows = cursor.fetchall()
     cursor.close()
 
-    return render_template('book.html', car=rows[0], start=start, end=end)
+    return render_template('book.html', car=rows[0], start=start, end=end, shour=int(startHour), ehour=int(endHour))
+
+
+@app.route('/bookConfirmed/<string:car_id>', methods=['POST'])
+def book_confirm(car_id):
+    start = request.form.get('start')
+    end = request.form.get('end')
+    startHour = request.form.get('startHour')
+    endHour = request.form.get('endHour')
+    if len(startHour) == 1:
+        startHour = '0' + startHour
+    if len(endHour) == 1:
+        endHour = '0' + endHour
+
+    params = {}
+    time_split = start.split("-")
+    params["start"] = start+" "+startHour+":00"+time.strftime('%z')
+    params["end"] = end+" "+endHour+":00"+time.strftime('%z')
+
+    cursor = g.conn.execute(text("SELECT count(*) FROM car C, reservation R WHERE C.car_id=R.car_id AND NOT (R.start_time>(:end) OR R.end_time<(:start))"), params)
+    rows = cursor.fetchall()
+    cursor.close()
+    if rows[0][0] > 0:
+        return render_template('error.html', message="That car is already booked for that period. Please search again for other cars.")
+
+    params["car_id"] = car_id
+    params["user_id"] = "Z9JH1D5" # for test
+
+    id_start = time_split[0][-2:] + time_split[1]+"0000"
+    id_end = time_split[0][-2:] + time_split[1]+"9999"
+    cursor = g.conn.execute(text("SELECT reserve_id FROM reservation R WHERE reserve_id BETWEEN '" + id_start + "' AND '" + id_end + "' ORDER BY reserve_id DESC"))
+    rows = cursor.fetchall()
+    cursor.close()
+    if len(rows) == 0:
+        params["id"] = id_start
+    else:
+        params["id"] = str(int(rows[-1][0]+1))
+    if params["id"][:4] != id_start[:4]:
+        return render_template('error.html', message="Reservation id overflow for that month!")
+
+    cursor = g.conn.execute(text("SELECT unit_time_price FROM car C, car_type CT WHERE C.model=CT.model AND C.car_id='" + car_id + "'"))
+    rows = cursor.fetchall()
+    cursor.close()
+    params["cost"] = rows[0][0]*(1+(datetime.strptime(end, '%Y-%m-%d') - datetime.strptime(start, '%Y-%m-%d')).days)
+
+    insert_table_command = """INSERT INTO reservation VALUES ((:id), (:start), (:end), (:cost), (:car_id), (:user_id))"""
+    g.conn.execute(text(insert_table_command), params)
+    g.conn.commit()
+    return redirect('/')
+
 
 if __name__ == "__main__":
     import click

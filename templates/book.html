@@ -1,4 +1,5 @@
 <html>
+  <title>Details for Booking {{car.model}}</title>
   <style>
     body{ 
       font-size: 15pt;
@@ -29,7 +30,7 @@
   <h1>Your Deal</h1>
   <hr>
   <div class="car_info">
-    <h4>{{car.model}} - {{car.brand}}</h4>
+    <h3>{{car.model}} at {{car.office_name}}</h3> <h5>made by {{car.brand}}</h5>
     <table border="0">
         <th>Capacity:</th><th>{{car.capacity}}</th><th>&emsp;&emsp;&emsp;</th>
         <th>Mileage:</th><th>{{car.mileage}}</th><th>&emsp;&emsp;&emsp;</th>
@@ -41,21 +42,32 @@
     </table>
     <br>
   </div>
-  <div>
-    <form class="option_area">
+  <br>
+  <div class="option_area" >
+    <!-- method="POST" action="/" -->
+    <form method="POST" action="/bookConfirmed/{{car.car_id}}">
         Start time:
-        <input type="datetime-local" name="start" value="{% if start is defined %}{{start}}{% else %}{{now}}{% endif %}"/> 
-        <!-- step="3600" min="{{now}}" -->
+        <input type="date" name="start" value="{% if start is defined %}{{start}}{% else %}{{today}}{% endif %}"/>
+        <select name="startHour">
+          {% for i in range(0, 24) %}
+            <option value="{{ i }}" {% if i == shour %} selected {% endif %}>{{ "{:02d}:00".format(i) }}</option>
+          {% endfor %}
+        </select>
         <br>
         End time:
-        <input type="datetime-local" name="end" value="{% if end is defined %}{{end}}{% else %}{{now}}{% endif %}"/> 
-        <br>
+        <input type="date" name="end" value="{% if end is defined %}{{end}}{% else %}{{today}}{% endif %}"/>
+        <select name="endHour">
+          {% for i in range(0, 24) %}
+            <option value="{{ i }}" {% if i == ehour %} selected {% endif %}>{{ "{:02d}:00".format(i) }}</option>
+          {% endfor %}
+        </select>
+        <!-- <br>
         <br>
         Insurance: 
-        <input type="checkbox" name="insuranceCheck" value="insurance">
+        <input type="checkbox" name="insuranceCheck" value="insurance"> -->
         <br>
         <br>
-        <input type="submit" value="Book" style="font-size:12pt;">
+        <input type="submit" value="book" style="font-size:12pt;">
     </form>
   </div>
 

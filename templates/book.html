@@ -54,7 +54,6 @@
   </div>
   <br>
   <div class="option_area" >
-    <!-- method="POST" action="/" -->
     <form method="POST" action="/bookConfirmed/{{car.car_id}}">
         <input type="hidden" name="start" value="{% if start is defined %}{{start}}{% else %}{{today}}{% endif %}">
         <input type="hidden" name="startHour" value="{{shour}}">
@@ -71,6 +70,11 @@
     </form>
   </div>
 
+  <div style="align-items:right">
+    <form action="/">
+      <input type="submit" value="return main page" style="font-size:12pt;">
+    </form>  
+  </div>
 
 </body>
 

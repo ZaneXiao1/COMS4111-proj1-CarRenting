@@ -10,7 +10,7 @@
     div{text-align: center;}
     table{margin: auto;}
     select{font-size: 12pt;}
-    .option_area{text-align:left;display:inline-block;}
+    .option_area{text-align:left; display:inline-block;}
   </style>
 
 
@@ -26,7 +26,7 @@
       <!-- onchange="this.form.submit()" -->
       <option value="none" selected="selected">any location</option>
       {% for off in offices %}
-      <option value="{{off}}" {% if off == office %}selected="selected"{% endif %}>{{off}}</option>
+      <option value="{{off}}" {% if off == office %}selected{% endif %}>{{off}}</option>
       {% endfor %}
     </select>
     <br>
@@ -34,16 +34,30 @@
     <select name="model">
       <option value="none" selected="selected">any model</option>
       {% for m in models %}
-      <option value="{{m}}" {% if m == model %}selected="selected"{% endif %}>{{m}}</option>
+      <option value="{{m}}" {% if m == model %} selected {% endif %}>{{m}}</option>
       {% endfor %}
     </select>
     <br>
     Start time:
-    <input type="datetime-local" name="start" value="{% if start is defined %}{{start}}{% else %}{{now}}{% endif %}"/> 
+    <input type="date" name="start" value="{% if start is defined %}{{start}}{% else %}{{today}}{% endif %}"/>
+    <select name="startHour">
+      {% for i in range(0, 24) %}
+        <option value="{{ i }}" {% if i == shour %} selected {% endif %}>{{ "{:02d}:00".format(i) }}</option>
+      {% endfor %}
+    </select>
     <!-- step="3600" min="{{now}}" -->
     <br>
     End time:
-    <input type="datetime-local" name="end" value="{% if end is defined %}{{end}}{% else %}{{now}}{% endif %}"/> 
+    <input type="date" name="end" value="{% if end is defined %}{{end}}{% else %}{{today}}{% endif %}"/>
+    <select name="endHour">
+      {% for i in range(0, 24) %}
+        <option value="{{ i }}" {% if i == ehour %} selected {% endif %}>{{ "{:02d}:00".format(i) }}</option>
+      {% endfor %}
+    </select>
+    <br>
+    Rate >= 4.5:
+    <input type="checkbox" name="high_rate" value="4.5"
+    {% if rated %}checked{% endif %}/> 
     <br>
     <br>
     <input type="submit" value="Search" style="font-size:12pt;">
@@ -55,27 +69,31 @@
 
   <hr>
 <div>
-  <table border="1">
-    {% if results|length <= 1 %}
-      {% if model is defined%}
-        <p>No avaliable car with model {{model}} at {{office}} for the time domain.</p>
-      {% else %}
-        <p>Choose your prefered location, model and time. Then click search to find cars!</p>
-      {% endif %}
+  
+  {% if results|length <= 1 %}
+    {% if model is defined%}
+      <p>No avaliable car with model {{model}} at {{office}} for the time domain.</p>
     {% else %}
-      {% if start is defined and end is defined and start > end%}
-        <p> start time should not be later than end time!</p>
-      {% else %}
+      <p>Choose your prefered location, model and time. Then click search to find cars!</p>
+    {% endif %}
+  {% else %}
+    {% if [start,end,ehour,shour] is defined and (start > end or (start == end and shour > ehour))%}
+      <p> Start time should not be later than end time!</p>
+    {% else %}
+      <table border="1">
+        <tr><td>car_id</td><td>color</td><td>mileage</td><td>model</td><td>location</td><td>brand</td><td>function</td><td>capacity</td><td>price/day($)</td><td>rating</td></tr>
         {% for i in results %}
             <tr>
                 {% for j in i %}
                     <td><b>{{ j }}</b></td>
                 {% endfor %}
+                <td><a href="{{ url_for('book', car_id=i[0]) }}" target="_blank">Book Car</a></td>
             </tr>
         {% endfor %}
-      {% endif %}
+      </table>
     {% endif %}
-  </table>
+  {% endif %}
+  
 </div>
 
 </body>

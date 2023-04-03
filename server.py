@@ -416,7 +416,7 @@ def signup():
 
 
 #onlineserver
-@app.route('/onlineserver/<string:username')
+@app.route('/onlineserver/<string:username>')
 def onlineserver(username):
     #To match a online server for the user.
     cursor = g.conn.execute(text('SELECT name FROM online_customer_service'))

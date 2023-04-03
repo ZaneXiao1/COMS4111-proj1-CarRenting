@@ -12,9 +12,10 @@ import os
   # accessible as a variable in index.html:
 from sqlalchemy import *
 from sqlalchemy.pool import NullPool
-from flask import Flask, request, render_template, g, redirect, Response, session
+from flask import Flask, request, render_template, g, redirect, Response, session, flash
 from datetime import datetime, date, timedelta
 import time
+import random
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -336,6 +337,83 @@ def book_confirm(car_id):
     return redirect('/')
 
 
+#Login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        if not all([email, password]):
+            flash('Incomplete parameters')
+
+        cursor = g.conn.execute(text("SELECT email, password FROM user Where users.email='email' AND users.password='password'"))
+
+        if cursor:
+            return 'Login successful!'
+
+        else:
+            return redirect('/login')
+
+        cursor.close()
+    return render_template('reservation.html', email = email)
+
+
+#Signup
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+        password2 = request.form.get('password2')
+
+        # check if the email has been registered
+        email_db = g.conn.execute(text('SELECT email FROM customer WHERE customer.email="email"'))
+        if email_db:
+            flash('This email has already been registered.')
+        if not all([email, password, password2]):
+            flash('Incomplete parameters')
+        if password != password2:
+            flash('The password entered twice is not the same, please re-enter it.')
+        else:
+            ID_1 = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            ID_2 = str(random.randint(0,9))          
+            ID_3 = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            ID_4 = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            ID_5 = str(random.randint(0,9))
+            ID_6 = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            ID_7 = str(random.randint(0,9))
+
+            new_ID = ID_1 + ID_2 + ID_3 + ID_4 + ID_5 + ID_6 + ID_7
+
+            #Change DB, lack of user name
+
+            insert_table_command = """INSERT INTO customer(email, password, user_id) VALUES ('email','password2','new_ID')"""
+            res = conn.execute(text(insert_table_command))
+
+            g.conn.commit()
+            return redirect('/login')
+
+    return render_template('signup.html')
+
+
+#onlineserver
+@app.route('/onlineserver/<string:username')
+def onlineserver(username):
+    #To match a online server for the user.
+    cursor = g.conn.execute(text('SELECT name FROM online_customer_service'))
+    r = cursor.fetchall()
+    server_1 = r[random.randint(0,9)]
+    cursor.close()
+
+    return render_template('signup.html', server_1 = server_1 )
+
+
+
+
+
+
+
+
 if __name__ == "__main__":
     import click
 
@@ -362,3 +440,5 @@ if __name__ == "__main__":
         app.run(host=HOST, port=PORT, debug=True, threaded=threaded)
 
 run()
+
+

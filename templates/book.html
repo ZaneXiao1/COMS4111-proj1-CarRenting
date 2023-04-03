@@ -32,35 +32,34 @@
   <div class="car_info">
     <h3>{{car.model}} at {{car.office_name}}</h3> <h5>made by {{car.brand}}</h5>
     <table border="0">
-        <th>Capacity:</th><th>{{car.capacity}}</th><th>&emsp;&emsp;&emsp;</th>
-        <th>Mileage:</th><th>{{car.mileage}}</th><th>&emsp;&emsp;&emsp;</th>
+        <th>Capacity:</th><th>{{car.capacity}}</th><th>&emsp;&emsp;</th>
+        <th>Mileage:</th><th>{{car.mileage}}</th><th>&emsp;&emsp;</th>
         <tr>
-        <th>Color:</th><th>{{car.color}}</th><th>&emsp;&emsp;&emsp;</th>
-        <th>Function:</th><th>{{car.function}}</th><th>&emsp;&emsp;&emsp;</th>
-        <tr>
-        <th>Price/day:</th><th>{{car.unit_time_price}}</th><th>&emsp;&emsp;&emsp;</th>
+        <th>Color:</th><th>{{car.color}}</th><th>&emsp;&emsp;</th>
+        <th>Function:</th><th>{{car.function}}</th><th>&emsp;&emsp;</th>
+      </tr><tr>
+        <th>Price/day:</th><th>${{car.unit_time_price}}</th><th>&emsp;&emsp;</th>
+      </tr><tr>
+        <th>&emsp;</th>
+      </tr><tr>
+        <th>Total Cost:</th><th>${{cost}}</th><th>&emsp;&emsp;</th>
+      </tr><tr>
+        <th>&emsp;</th>
+      </tr><tr>
+        <th>Start time:</th><th>{% if start is defined %}{{start}}{% else %}{{today}}{% endif %} {{ "{:02d}:00".format(shour) }}</th><th>&emsp;&emsp;&emsp;</th>
+        <th>End time:</th><th>{% if start is defined %}{{end}}{% else %}{{today}}{% endif %} {{ "{:02d}:00".format(ehour) }}</th><th>&emsp;&emsp;&emsp;</th>
+      </tr>
     </table>
     <br>
   </div>
   <br>
   <div class="option_area" >
-    <!-- method="POST" action="/" -->
     <form method="POST" action="/bookConfirmed/{{car.car_id}}">
-        Start time:
-        <input type="date" name="start" value="{% if start is defined %}{{start}}{% else %}{{today}}{% endif %}"/>
-        <select name="startHour">
-          {% for i in range(0, 24) %}
-            <option value="{{ i }}" {% if i == shour %} selected {% endif %}>{{ "{:02d}:00".format(i) }}</option>
-          {% endfor %}
-        </select>
-        <br>
-        End time:
-        <input type="date" name="end" value="{% if end is defined %}{{end}}{% else %}{{today}}{% endif %}"/>
-        <select name="endHour">
-          {% for i in range(0, 24) %}
-            <option value="{{ i }}" {% if i == ehour %} selected {% endif %}>{{ "{:02d}:00".format(i) }}</option>
-          {% endfor %}
-        </select>
+        <input type="hidden" name="start" value="{% if start is defined %}{{start}}{% else %}{{today}}{% endif %}">
+        <input type="hidden" name="startHour" value="{{shour}}">
+        <input type="hidden" name="end" value="{% if end is defined %}{{end}}{% else %}{{today}}{% endif %}">
+        <input type="hidden" name="endHour" value="{{ehour}}">
+        <input type="hidden" name="cost" value="{{cost}}">
         <!-- <br>
         <br>
         Insurance: 
@@ -71,6 +70,11 @@
     </form>
   </div>
 
+  <div style="align-items:right">
+    <form action="/">
+      <input type="submit" value="return main page" style="font-size:12pt;">
+    </form>  
+  </div>
 
 </body>
 

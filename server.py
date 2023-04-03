@@ -281,12 +281,27 @@ def book(car_id):
     end = session.get('end')
     startHour = session.get('startHour')
     endHour = session.get('endHour')
+    today = str(date.today())
+    hour = str(datetime.now().hour)
+    if start == None:
+        start = today
+    if end == None:
+        end = today
+    if startHour== None:
+        startHour = hour
+    if endHour == None:
+        endHour = hour
+    
+    cursor = g.conn.execute(text("SELECT unit_time_price FROM car C, car_type CT WHERE C.model=CT.model AND C.car_id='" + car_id + "'"))
+    rows = cursor.fetchall()
+    cursor.close()
+    cost = rows[0][0]*(1+(datetime.strptime(end, '%Y-%m-%d') - datetime.strptime(start, '%Y-%m-%d')).days)
     
     cursor = g.conn.execute(text("SELECT car_id, C.model, brand, capacity, mileage, color, function, unit_time_price, office_name FROM car C, car_type CT WHERE C.model=CT.model AND C.car_id='" + car_id + "'"))
     rows = cursor.fetchall()
     cursor.close()
 
-    return render_template('book.html', car=rows[0], start=start, end=end, shour=int(startHour), ehour=int(endHour))
+    return render_template('book.html', car=rows[0], start=start, end=end, shour=int(startHour), ehour=int(endHour), cost=cost)
 
 
 @app.route('/bookConfirmed/<string:car_id>', methods=['POST'])
@@ -295,6 +310,7 @@ def book_confirm(car_id):
     end = request.form.get('end')
     startHour = request.form.get('startHour')
     endHour = request.form.get('endHour')
+    cost = request.form.get('cost')
     if len(startHour) == 1:
         startHour = '0' + startHour
     if len(endHour) == 1:
@@ -326,10 +342,13 @@ def book_confirm(car_id):
     if params["id"][:4] != id_start[:4]:
         return render_template('error.html', message="Reservation id overflow for that month!")
 
-    cursor = g.conn.execute(text("SELECT unit_time_price FROM car C, car_type CT WHERE C.model=CT.model AND C.car_id='" + car_id + "'"))
-    rows = cursor.fetchall()
-    cursor.close()
-    params["cost"] = rows[0][0]*(1+(datetime.strptime(end, '%Y-%m-%d') - datetime.strptime(start, '%Y-%m-%d')).days)
+    if cost == None or cost == '':
+        cursor = g.conn.execute(text("SELECT unit_time_price FROM car C, car_type CT WHERE C.model=CT.model AND C.car_id='" + car_id + "'"))
+        rows = cursor.fetchall()
+        cursor.close()
+        params["cost"] = rows[0][0]*(1+(datetime.strptime(end, '%Y-%m-%d') - datetime.strptime(start, '%Y-%m-%d')).days)
+    else:
+        params["cost"] = cost
 
     insert_table_command = """INSERT INTO reservation VALUES ((:id), (:start), (:end), (:cost), (:car_id), (:user_id))"""
     g.conn.execute(text(insert_table_command), params)

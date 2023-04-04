@@ -17,6 +17,9 @@
 
     <div class="login">
         {% if session.get('user_login') %}
+        <form action="/onlineserver">
+            <input type="submit" value="custumer service" style="font-size:12pt;">
+          </form>
         <form action="/logout">
           <input type="submit" value="logout" style="font-size:12pt;">
         </form>

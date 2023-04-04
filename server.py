@@ -458,15 +458,14 @@ def signup():
 
 
 #onlineserver
-@app.route('/onlineserver/<string:username>')
-def onlineserver(username):
+@app.route('/onlineserver')
+def onlineserver():
     #To match a online server for the user.
     cursor = g.conn.execute(text('SELECT name FROM online_customer_service'))
     r = cursor.fetchall()
-    server_1 = r[random.randint(0,9)]
+    server_1 = r[random.randint(0,9)][0]
     cursor.close()
-
-    return render_template('signup.html', server_1 = server_1 )
+    return render_template('onlineserver.html', server_1 = str(server_1) )
 
 
 @app.route('/reservation')

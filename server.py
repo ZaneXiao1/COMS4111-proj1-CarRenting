@@ -379,8 +379,9 @@ def login():
 
         if len(row)>0:
             flash('success login!')
+            session['user_login'] = email
             cursor.close()
-            return redirect('/login')
+            return redirect('/reservation')
 
         else:
             flash("fail login!")
@@ -441,11 +442,14 @@ def signup():
             insert_table_command = """INSERT INTO customer(email, password, user_id) VALUES ((:email),(:password2),(:new_ID))"""
             res = g.conn.execute(text(insert_table_command), params)
 
+
+
             g.conn.commit()
             flash('Sign up successfuly!')
             return redirect('/login')
 
     return render_template('signup.html')
+
 
 
 #onlineserver
@@ -460,9 +464,20 @@ def onlineserver(username):
     return render_template('signup.html', server_1 = server_1 )
 
 
+@app.route('/reservation')
+def reservation():
+    email_reservation = session.get('user_login')
+    cursor = g.conn.execute(text("SELECT reserve_id, start_time, end_time, total_cost, model, brand, unit_time_price FROM reservationm R,customer CU,car_type CT WHERE CT.car_id=R.car_id and R.user_id = CU.user_id and CU.email= '"+email_reservation+"'"))
+    r = cursor.fetchall()
+    return render_template('search.html', results=r)
 
 
 
+# Logout route
+@app.route('/logout')
+def logout():
+    session.pop('user_login', None)
+    return redirect('/')
 
 
 

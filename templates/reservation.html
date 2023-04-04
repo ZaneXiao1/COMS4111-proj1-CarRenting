@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>reservatioin</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+  </head>
+
+  <body>
+    <h1>Reservation</h1>
+    
+    <table border="1">
+        <tr><td>reservation_id</td><td>start_time</td><td>end_time</td><td>total cost</td><td>car id</td><td>model</td><td>brand</td><td>price per day</td></tr>
+        {% for i in results %}
+            <tr>
+                {% for j in i %}
+                    <td><b>{{ j }}</b></td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+      </table>
+  </body>
+</html> 

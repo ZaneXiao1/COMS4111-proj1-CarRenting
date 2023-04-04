@@ -307,8 +307,8 @@ def book(car_id):
 
 @app.route('/bookConfirmed/<string:car_id>', methods=['POST'])
 def book_confirm(car_id):
-    user_id = session.get('user_id')
-    if user_id == None:
+    user_email = session.get('user_login')
+    if user_email == None:
         return redirect('/login')
     start = request.form.get('start')
     end = request.form.get('end')
@@ -329,12 +329,17 @@ def book_confirm(car_id):
     cursor = g.conn.execute(text("SELECT count(*) FROM reservation R WHERE R.car_id=(:car_id) AND NOT (R.start_time>(:end) OR R.end_time<(:start))"), params)
     rows = cursor.fetchall()
     cursor.close()
-    print("rows[][]", rows[0][0])
     if rows[0][0] > 0:
         return render_template('error.html', message="That car is already booked for that period. Please search again for other cars.")
 
     params["car_id"] = car_id
-    params["user_id"] = "Z9JH1D5" # for test
+
+    cursor = g.conn.execute(text("SELECT user_id FROM customer CU WHERE CU.email='"+user_email+"'"))
+    rows = cursor.fetchall()
+    cursor.close()
+    if len(rows) == 0:
+        return redirect('/logout')
+    params["user_id"] = rows[0][0] # for test
 
     id_start = time_split[0][-2:] + time_split[1]+"0000"
     id_end = time_split[0][-2:] + time_split[1]+"9999"

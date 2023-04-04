@@ -22,11 +22,15 @@
 <body>
   <h1>Finding Avaliable Cars</h1>
   <hr>
-  
+
   <div class="login">
-    {% if session.get('user_id') %}
-    <form action="/search">
+    {% if session.get('user_login') %}
+    <form action="/">
       <input type="submit" value="account" style="font-size:12pt;">
+    </form>
+    <form action="/">
+      <input type="submit" value="logout" style="font-size:12pt;">
+    </form>
     {% else %}
     <form action="/login">
       <input type="submit" value="login" style="font-size:12pt;">

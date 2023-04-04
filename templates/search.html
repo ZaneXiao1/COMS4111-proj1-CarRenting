@@ -11,12 +11,28 @@
     table{margin: auto;}
     select{font-size: 12pt;}
     .option_area{text-align:left; display:inline-block;}
+    .login {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
   </style>
 
 
 <body>
   <h1>Finding Avaliable Cars</h1>
   <hr>
+  
+  <div class="login">
+    {% if session.get('user_id') %}
+    <form action="/search">
+      <input type="submit" value="account" style="font-size:12pt;">
+    {% else %}
+    <form action="/login">
+      <input type="submit" value="login" style="font-size:12pt;">
+    {% endif %}
+    </form>
+  </div>
 
 <div>
   <div class="option_area">

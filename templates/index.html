@@ -20,10 +20,10 @@
 
 <div class="login">
   {% if session.get('user_login') %}
-  <form action="/">
+  <form action="/reservation">
     <input type="submit" value="account" style="font-size:12pt;">
   </form>
-  <form action="/">
+  <form action="/logout">
     <input type="submit" value="logout" style="font-size:12pt;">
   </form>
   {% else %}

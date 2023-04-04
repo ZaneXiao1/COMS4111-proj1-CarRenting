@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<style>
+    .login {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+</style>
 <html>
   <head>
     <title>reservatioin</title>
@@ -7,9 +14,24 @@
 
   <body>
     <h1>Reservation</h1>
+
+    <div class="login">
+        {% if session.get('user_login') %}
+        <form action="/logout">
+          <input type="submit" value="logout" style="font-size:12pt;">
+        </form>
+        {% else %}
+        <form action="/login">
+          <input type="submit" value="login" style="font-size:12pt;">
+        {% endif %}
+        </form>
+      </div>
+
+      <p><a href="search">Find available cars!</a></p>
+      <br>
     
     <table border="1">
-        <tr><td>reservation_id</td><td>start_time</td><td>end_time</td><td>total cost</td><td>car id</td><td>model</td><td>brand</td><td>price per day</td></tr>
+        <tr><td>reservation_id</td><td>start_time</td><td>end_time</td><td>total cost</td><td>model</td><td>brand</td><td>price per day</td></tr>
         {% for i in results %}
             <tr>
                 {% for j in i %}

@@ -343,7 +343,7 @@ def book_confirm(car_id):
 
     id_start = time_split[0][-2:] + time_split[1]+"0000"
     id_end = time_split[0][-2:] + time_split[1]+"9999"
-    cursor = g.conn.execute(text("SELECT reserve_id FROM reservation R WHERE reserve_id BETWEEN '" + id_start + "' AND '" + id_end + "' ORDER BY reserve_id DESC"))
+    cursor = g.conn.execute(text("SELECT reserve_id FROM reservation R WHERE reserve_id BETWEEN '" + id_start + "' AND '" + id_end + "' ORDER BY reserve_id ASC"))
     rows = cursor.fetchall()
     cursor.close()
     if len(rows) == 0:
@@ -364,7 +364,7 @@ def book_confirm(car_id):
     insert_table_command = """INSERT INTO reservation VALUES ((:id), (:start), (:end), (:cost), (:car_id), (:user_id))"""
     g.conn.execute(text(insert_table_command), params)
     g.conn.commit()
-    return redirect('/')
+    return redirect('/reservation')
 
 
 #Login
@@ -472,9 +472,9 @@ def onlineserver(username):
 @app.route('/reservation')
 def reservation():
     email_reservation = session.get('user_login')
-    cursor = g.conn.execute(text("SELECT reserve_id, start_time, end_time, total_cost, model, brand, unit_time_price FROM reservationm R,customer CU,car_type CT WHERE CT.car_id=R.car_id and R.user_id = CU.user_id and CU.email= '"+email_reservation+"'"))
+    cursor = g.conn.execute(text("SELECT reserve_id, start_time, end_time, total_cost, C.model, brand, unit_time_price FROM reservation R,customer CU,car_type CT,car C WHERE CT.model=C.model and C.car_id=R.car_id and R.user_id = CU.user_id and CU.email= '"+email_reservation+"'"))
     r = cursor.fetchall()
-    return render_template('search.html', results=r)
+    return render_template('reservation.html', results=r)
 
 
 
@@ -509,7 +509,7 @@ if __name__ == "__main__":
 
         HOST, PORT = host, port
         print("running on %s:%d" % (HOST, PORT))
-        app.run(host=HOST, port=PORT, debug=True, threaded=threaded)
+        app.run(host=HOST, port=PORT, threaded=threaded)
 
 run()
 

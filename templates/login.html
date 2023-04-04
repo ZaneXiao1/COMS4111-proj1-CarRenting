@@ -6,6 +6,13 @@
   </head>
 
   <body>
+    {% with messages = get_flashed_messages() %}  
+         {% if messages %}  
+               {% for message in messages %}  
+                    <p>{{ message }}</p>  
+               {% endfor %}  
+         {% endif %}  
+      {% endwith %}  
     <h1>User Login</h1>
     <form method="POST">
       <label for="email">Email:</label>
@@ -13,8 +20,12 @@
       <label for="password">Password:</label>
       <input type="password" id="password" name="password" ><br><br>
       <input type="submit" value="Login">
-      <input type="submit" value="Sign up">
     </form>
+      <form method='get' action='/signup'>
+      <button type="submit">Sign up</button>
+    </form>
+
+    
   </body>
 </html> 
 

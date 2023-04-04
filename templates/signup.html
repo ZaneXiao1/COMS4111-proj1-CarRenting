@@ -6,12 +6,20 @@
   </head>
 
   <body>
+    {% with messages = get_flashed_messages() %}  
+         {% if messages %}  
+               {% for message in messages %}  
+                    <p>{{ message }}</p>  
+               {% endfor %}  
+         {% endif %}  
+      {% endwith %} 
     <h1>User Sign up</h1>
-    <form action="login.php" method="post">
+    <form action="/signup" method="post">
       <label for="email"> Enter Your Email:</label>
       <input type="email" id="email" name="email" ><br><br>
       <label for="password">Set Your Password:</label>
       <input type="password" id="password" name="password"><br><br>
+      <text>"At least 6 digits, contain uppercase letter and number"</text><br><br>
       <label for="password2">Confirm Your Password:</label>
       <input type="password" id="password2" name="password2">
 

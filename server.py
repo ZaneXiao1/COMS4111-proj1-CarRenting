@@ -16,6 +16,7 @@ from flask import Flask, request, render_template, g, redirect, Response, sessio
 from datetime import datetime, date, timedelta
 import time
 import random
+import re
 
 tmpl_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates')
 app = Flask(__name__, template_folder=tmpl_dir)
@@ -365,16 +366,24 @@ def login():
         if not all([email, password]):
             flash('Incomplete parameters')
 
-        cursor = g.conn.execute(text("SELECT email, password FROM user Where users.email='email' AND users.password='password'"))
+        params = {}
+        params["email"] = email
+        params["password"] = password
+        cursor = g.conn.execute(text("SELECT email, password FROM customer Where email=(:email) AND password=(:password)"), params)
+        row = cursor.fetchall()
 
-        if cursor:
-            return 'Login successful!'
-
-        else:
+        if len(row)>0:
+            flash('success login!')
+            cursor.close()
             return redirect('/login')
 
-        cursor.close()
-    return render_template('reservation.html', email = email)
+        else:
+            flash("fail login!")
+            cursor.close()
+            return redirect('/login')
+
+    return render_template('login.html')
+    
 
 
 #Signup
@@ -386,13 +395,27 @@ def signup():
         password2 = request.form.get('password2')
 
         # check if the email has been registered
-        email_db = g.conn.execute(text('SELECT email FROM customer WHERE customer.email="email"'))
-        if email_db:
+        params = {}
+        params["email"] = email
+        cursor = g.conn.execute(text('SELECT email FROM customer WHERE customer.email=(:email)'), params)
+        row = cursor.fetchall()
+
+        if len(row)>0:
             flash('This email has already been registered.')
+            return redirect('/signup')
+
         if not all([email, password, password2]):
             flash('Incomplete parameters')
+            return redirect('/signup')
+
         if password != password2:
             flash('The password entered twice is not the same, please re-enter it.')
+            return redirect('/signup')
+
+        if re.search('[A-Z]', password) == None or re.search('[0-9]', password) == None:
+            flash('The password must have at least 6 digits and contain uppercase letter and number.')
+            return redirect('/signup')
+
         else:
             ID_1 = random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
             ID_2 = str(random.randint(0,9))          
@@ -406,10 +429,15 @@ def signup():
 
             #Change DB, lack of user name
 
-            insert_table_command = """INSERT INTO customer(email, password, user_id) VALUES ('email','password2','new_ID')"""
-            res = conn.execute(text(insert_table_command))
+            params = {}
+            params["email"] = email
+            params["password2"] = password2
+            params["new_ID"] = new_ID
+            insert_table_command = """INSERT INTO customer(email, password, user_id) VALUES ((:email),(:password2),(:new_ID))"""
+            res = g.conn.execute(text(insert_table_command), params)
 
             g.conn.commit()
+            flash('Sign up successfuly!')
             return redirect('/login')
 
     return render_template('signup.html')

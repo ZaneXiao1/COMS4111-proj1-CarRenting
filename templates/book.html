@@ -4,8 +4,6 @@
     body{ 
       font-size: 15pt;
       font-family: arial;
-      
-      
     }
     table {
       font-size: 15pt;
@@ -23,10 +21,30 @@
       margin: auto;
     }
     .option_area{text-align:left; display:inline-block;}
+    .login {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
   </style>
 
 
 <body>
+  <div class="login">
+    {% if session.get('user_login') %}
+    <form action="/">
+      <input type="submit" value="account" style="font-size:12pt;">
+    </form>
+    <form action="/">
+      <input type="submit" value="logout" style="font-size:12pt;">
+    </form>
+    {% else %}
+    <form action="/login">
+      <input type="submit" value="login" style="font-size:12pt;">
+    {% endif %}
+    </form>
+  </div>
+  
   <div style="text-align: center;">
       <h1>Your Deal</h1>
     <hr>

@@ -1,4 +1,5 @@
 <html>
+  <title>Car Rental 4111~</title>
   <style>
     body{ 
       font-size: 15pt;
@@ -18,9 +19,13 @@
 <p><a href="search">Find available cars!</a></p>
 
 <div class="login">
-  {% if session.get('user_id') %}
-  <form action="/search">
+  {% if session.get('user_login') %}
+  <form action="/">
     <input type="submit" value="account" style="font-size:12pt;">
+  </form>
+  <form action="/">
+    <input type="submit" value="logout" style="font-size:12pt;">
+  </form>
   {% else %}
   <form action="/login">
     <input type="submit" value="login" style="font-size:12pt;">

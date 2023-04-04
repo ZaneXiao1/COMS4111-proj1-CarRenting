@@ -307,6 +307,9 @@ def book(car_id):
 
 @app.route('/bookConfirmed/<string:car_id>', methods=['POST'])
 def book_confirm(car_id):
+    user_id = session.get('user_id')
+    if user_id == None:
+        return redirect('/login')
     start = request.form.get('start')
     end = request.form.get('end')
     startHour = request.form.get('startHour')
@@ -321,10 +324,12 @@ def book_confirm(car_id):
     time_split = start.split("-")
     params["start"] = start+" "+startHour+":00"+time.strftime('%z')
     params["end"] = end+" "+endHour+":00"+time.strftime('%z')
+    params["car_id"] = car_id
 
-    cursor = g.conn.execute(text("SELECT count(*) FROM car C, reservation R WHERE C.car_id=R.car_id AND NOT (R.start_time>(:end) OR R.end_time<(:start))"), params)
+    cursor = g.conn.execute(text("SELECT count(*) FROM reservation R WHERE R.car_id=(:car_id) AND NOT (R.start_time>(:end) OR R.end_time<(:start))"), params)
     rows = cursor.fetchall()
     cursor.close()
+    print("rows[][]", rows[0][0])
     if rows[0][0] > 0:
         return render_template('error.html', message="That car is already booked for that period. Please search again for other cars.")
 
@@ -339,7 +344,7 @@ def book_confirm(car_id):
     if len(rows) == 0:
         params["id"] = id_start
     else:
-        params["id"] = str(int(rows[-1][0]+1))
+        params["id"] = str(int(rows[-1][0])+1)
     if params["id"][:4] != id_start[:4]:
         return render_template('error.html', message="Reservation id overflow for that month!")
 
